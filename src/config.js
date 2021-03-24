@@ -1,4 +1,4 @@
-export default config = {
+export const config = {
   apiKey: 'AIzaSyAtUeefYJRJfU9UFkbE3y26F6AWdFvOxQ8',
   authDomain: 'subculture-labs-c2085.firebaseapp.com',
   databaseURL: 'https://subculture-labs-c2085-default-rtdb.firebaseio.com',
