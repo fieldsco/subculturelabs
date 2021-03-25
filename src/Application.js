@@ -1,8 +1,9 @@
-import './App.css';
-import { Layout, Select, Menu } from 'antd';
+import { Layout, Select, Menu, Breadcrumb } from 'antd';
 import { FirebaseDatabaseNode } from '@react-firebase/database';
+import styled from 'styled-components';
+import './App.css';
 
-const { Header, Content } = Layout;
+const { Header, Content, Footer } = Layout;
 const { Option } = Select;
 
 const getMenu = list => (
@@ -12,11 +13,17 @@ const getMenu = list => (
 )
 
 const handleChange = e => {
-  console.log(e)
 }
+
+const InnerContent = styled.div`
+  min-height: 280px;
+  padding: 24px;
+  background: #fff;
+`;
 
 const Application = () => (
   <Layout className='layout'>
+    <div className="logo" />
     <Header>
       <Menu theme='dark' mode='horizontal' selectedKeys={['1']}>
         <Menu.Item key='1'>Recipes</Menu.Item>
@@ -24,18 +31,21 @@ const Application = () => (
       </Menu>
     </Header>
     <Content style={{ padding: '0 50px' }}>
-    <div className='site-layout-content'>
-      <FirebaseDatabaseNode path="/type" limitToFirst={10}>
-        {(d) => {
-          console.log(d)
-          return d.value ? (
-          <Select placeholder='Type' onChange={handleChange} style={{ width: 120 }}>
-            {getMenu(d.value)}
-        </Select>) : null
-      }}
-      </FirebaseDatabaseNode>
-      </div>
+      <Breadcrumb style={{ margin: '16px 0' }}>
+        <Breadcrumb.Item>Recipes</Breadcrumb.Item>
+      </Breadcrumb>
+      <InnerContent>
+        <FirebaseDatabaseNode path="/type" limitToFirst={10}>
+          {(d) => {
+            return d.value ? (
+            <Select placeholder='Type' onChange={handleChange} style={{ width: 120 }}>
+              {getMenu(d.value)}
+          </Select>) : null
+        }}
+        </FirebaseDatabaseNode>
+      </InnerContent>
     </Content>
+    <Footer style={{ textAlign: 'center' }}>Subculture Labs ©2021</Footer>
   </Layout>
 );
 
