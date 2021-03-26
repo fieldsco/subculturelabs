@@ -6,7 +6,7 @@ import { config } from './config';
 function App() {
   return (
     <FirebaseDatabaseProvider firebase={firebase} {...config}>
-      <div className="App">
+      <div className='App'>
         <Application />
       </div>
     </FirebaseDatabaseProvider>
