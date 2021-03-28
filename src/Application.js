@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Layout, Select, Menu, Button, Spin } from 'antd';
+import { Layout, Select, Menu, Button, Spin, Form } from 'antd';
 import { FirebaseDatabaseNode } from '@react-firebase/database';
 import styled from 'styled-components';
 import './App.css';
@@ -11,6 +11,7 @@ const { Option } = Select;
 const InnerContent = styled.div`
   flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
   padding: 24px;
   background: #fff;
@@ -18,12 +19,14 @@ const InnerContent = styled.div`
 
 const Application = () => {
   const [chosen, setChosen] = useState({});
+  const [showRecipe, setShowRecipe] = useState(false);
+  const [form] = Form.useForm();
 
   const handleChange = e => {
     const arr = e.split('-');
     const obj = Object.assign(chosen, {});
     obj[arr[0]] = arr[1];
-    setChosen({ ...chosen, ...obj })
+    setChosen({ ...chosen, ...obj });
   };
 
   const getMenu = (prop, list) =>
@@ -38,20 +41,30 @@ const Application = () => {
       <FirebaseDatabaseNode key={prop} path={`/${prop}`}>
         {d => {
           return d.value ? (
-            <Select
-              placeholder={`${prop[0].toUpperCase()}${prop.slice(1)}`}
-              onChange={handleChange}
-              style={{ width: 120, margin: '0 4px 0 4px' }}>
-              {getMenu(prop, d.value)}
-            </Select>
-          ) : <Spin style={{ width: 120 }} />;
+            <Form.Item name={prop} rules={[{ required: true }]}>
+              <Select
+                placeholder={`${prop[0].toUpperCase()}${prop.slice(1)}`}
+                onChange={handleChange}
+                style={{ width: 120, margin: '0 4px 0 4px' }}>
+                {getMenu(prop, d.value)}
+              </Select>
+            </Form.Item>
+          ) : (
+            <Spin style={{ width: 120 }} />
+          );
         }}
       </FirebaseDatabaseNode>
     ));
 
   const handleSubmit = () => {
     console.log(chosen);
-  }
+    setShowRecipe(true);
+  };
+
+  const handleReset = () => {
+    form.resetFields();
+    setShowRecipe(false);
+  };
 
   return (
     <Layout className='layout' style={{ height: '100%' }}>
@@ -61,16 +74,26 @@ const Application = () => {
           <Menu.Item key='2'>Orders</Menu.Item>
         </Menu>
       </Header>
-      <Content style={{ display: 'flex', flexDirection: 'column', padding: '0 50px' }}>
+      <Content style={{ display: 'flex', flexDirection: 'column', padding: '0 48px' }}>
         <div style={{ margin: '16px 0' }} />
         <InnerContent>
-          {getSelects()}
-          <Button type='primary' disabled={Object.keys(chosen).length < 4} onClick={handleSubmit} style={{ margin: '0 4px 0 4px' }}>
-            Get Recipe
-          </Button>
+          <Form form={form} style={{ display: 'flex' }}>
+            {getSelects()}
+            <Button
+              type='primary'
+              disabled={Object.keys(chosen).length < 4}
+              onClick={handleSubmit}
+              style={{ marginLeft: '4px' }}>
+              Get Recipe
+            </Button>
+            <Button type='link' onClick={handleReset}>
+              reset
+            </Button>
+          </Form>
+          {showRecipe && <h2 style={{ margin: '20px 0 0 4px' }}>test</h2>}
         </InnerContent>
       </Content>
-      <Footer style={{ textAlign: 'center' }}>Subculture Labs ©2021</Footer>
+      <Footer>Subculture Labs ©2021</Footer>
     </Layout>
   );
 };
