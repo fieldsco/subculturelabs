@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Layout, Select, Menu, Breadcrumb, Button } from 'antd';
+import { Layout, Select, Menu, Button, Spin } from 'antd';
 import { FirebaseDatabaseNode } from '@react-firebase/database';
 import styled from 'styled-components';
 import './App.css';
@@ -9,7 +9,9 @@ const { Header, Content, Footer } = Layout;
 const { Option } = Select;
 
 const InnerContent = styled.div`
-  min-height: 280px;
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
   padding: 24px;
   background: #fff;
 `;
@@ -39,10 +41,10 @@ const Application = () => {
             <Select
               placeholder={`${prop[0].toUpperCase()}${prop.slice(1)}`}
               onChange={handleChange}
-              style={{ width: 120 }}>
+              style={{ width: 120, margin: '0 4px 0 4px' }}>
               {getMenu(prop, d.value)}
             </Select>
-          ) : null;
+          ) : <Spin style={{ width: 120 }} />;
         }}
       </FirebaseDatabaseNode>
     ));
@@ -52,21 +54,18 @@ const Application = () => {
   }
 
   return (
-    <Layout className='layout'>
-      <div className='logo' />
+    <Layout className='layout' style={{ height: '100%' }}>
       <Header>
         <Menu theme='dark' mode='horizontal' selectedKeys={['1']}>
           <Menu.Item key='1'>Recipes</Menu.Item>
           <Menu.Item key='2'>Orders</Menu.Item>
         </Menu>
       </Header>
-      <Content style={{ padding: '0 50px' }}>
-        <Breadcrumb style={{ margin: '16px 0' }}>
-          <Breadcrumb.Item>Recipes</Breadcrumb.Item>
-        </Breadcrumb>
+      <Content style={{ display: 'flex', flexDirection: 'column', padding: '0 50px' }}>
+        <div style={{ margin: '16px 0' }} />
         <InnerContent>
           {getSelects()}
-          <Button type='primary' disabled={Object.keys(chosen).length < 4} onClick={handleSubmit}>
+          <Button type='primary' disabled={Object.keys(chosen).length < 4} onClick={handleSubmit} style={{ margin: '0 4px 0 4px' }}>
             Get Recipe
           </Button>
         </InnerContent>
