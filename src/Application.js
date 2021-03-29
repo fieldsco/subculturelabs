@@ -47,7 +47,9 @@ const Application = () => {
               </Select>
             </Form.Item>
           ) : (
-            <Spin />
+            <div>
+              <Spin />
+            </div>
           )
         }
       </FirebaseDatabaseNode>
@@ -97,7 +99,7 @@ const Application = () => {
             </Button>
           </Form>
           {showRecipe && (
-            <div style={{ marginLeft: '32px' }}>
+            <div style={{ flex: 1, marginLeft: '32px' }}>
               <FirebaseDatabaseNode path='/recipe'>
                 {d => (d.value ? <div style={{ textAlign: 'justify' }}>{d.value}</div> : <Spin />)}
               </FirebaseDatabaseNode>
