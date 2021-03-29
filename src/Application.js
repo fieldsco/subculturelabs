@@ -11,10 +11,9 @@ const { Option } = Select;
 const InnerContent = styled.div`
   flex: 1;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
   padding: 24px;
   background: #fff;
+  margin-top: 32px;
 `;
 
 const Application = () => {
@@ -44,8 +43,7 @@ const Application = () => {
             <Form.Item name={prop} rules={[{ required: true }]}>
               <Select
                 placeholder={`${prop[0].toUpperCase()}${prop.slice(1)}`}
-                onChange={handleChange}
-                style={{ width: 120, margin: '0 4px 0 4px' }}>
+                onChange={handleChange}>
                 {getMenu(prop, d.value)}
               </Select>
             </Form.Item>
@@ -64,6 +62,7 @@ const Application = () => {
   const handleReset = () => {
     form.resetFields();
     setShowRecipe(false);
+    setChosen({});
   };
 
   return (
@@ -74,23 +73,21 @@ const Application = () => {
           <Menu.Item key='2'>Orders</Menu.Item>
         </Menu>
       </Header>
-      <Content style={{ display: 'flex', flexDirection: 'column', padding: '0 48px' }}>
-        <div style={{ margin: '16px 0' }} />
+      <Content style={{ display: 'flex', padding: '0 48px' }}>
         <InnerContent>
-          <Form form={form} style={{ display: 'flex' }}>
+          <Form form={form}>
             {getSelects()}
             <Button
               type='primary'
               disabled={Object.keys(chosen).length < 4}
-              onClick={handleSubmit}
-              style={{ marginLeft: '4px' }}>
+              onClick={handleSubmit}>
               Get Recipe
             </Button>
             <Button type='link' onClick={handleReset}>
               reset
             </Button>
           </Form>
-          {showRecipe && <h2 style={{ margin: '20px 0 0 4px' }}>test</h2>}
+          {showRecipe && <h2 style={{ marginLeft: '32px' }}>Here is the recipe</h2>}
         </InnerContent>
       </Content>
       <Footer>Subculture Labs ©2021</Footer>
