@@ -38,8 +38,7 @@ const Application = () => {
   const getSelects = () =>
     config.app.recipeProps.map(prop => (
       <FirebaseDatabaseNode key={prop} path={`/${prop}`}>
-        {d => {
-          return d.value ? (
+        {d => d.value ? (
             <Form.Item name={prop} rules={[{ required: true }]}>
               <Select
                 placeholder={`${prop[0].toUpperCase()}${prop.slice(1)}`}
@@ -47,10 +46,8 @@ const Application = () => {
                 {getMenu(prop, d.value)}
               </Select>
             </Form.Item>
-          ) : (
-            <Spin style={{ width: 120 }} />
-          );
-        }}
+          ) : <Spin />
+        }
       </FirebaseDatabaseNode>
     ));
 
@@ -87,7 +84,14 @@ const Application = () => {
               reset
             </Button>
           </Form>
-          {showRecipe && <h2 style={{ marginLeft: '32px' }}>Here is the recipe</h2>}
+          {showRecipe && 
+            <div style={{ marginLeft: '32px' }}>
+              <h2>Recipe</h2>
+              <FirebaseDatabaseNode path='/recipe'>
+                {d => d.value || <Spin />}
+              </FirebaseDatabaseNode>
+            </div>
+          }
         </InnerContent>
       </Content>
       <Footer>Subculture Labs ©2021</Footer>
