@@ -17,6 +17,14 @@ const InnerContent = styled.div`
   margin-top: 32px;
 `;
 
+const FormWrapper = styled.div`
+  min-width: 30px;
+
+  @media screen and (min-width: 640px) {
+    min-width: 150px;
+  }
+`;
+
 const Application = () => {
   const [chosen, setChosen] = useState({});
   const [showRecipe, setShowRecipe] = useState(false);
@@ -91,13 +99,15 @@ const Application = () => {
       </Header>
       <Content style={{ display: 'flex', padding: '0 48px' }}>
         <InnerContent>
-          <Form form={form} style={{ minWidth: '250px' }}>
-            {getSelects()}
-            {getRecipeButton()}
-            <Button type='link' onClick={handleReset}>
-              reset
-            </Button>
-          </Form>
+          <FormWrapper>
+            <Form form={form}>
+              {getSelects()}
+              {getRecipeButton()}
+              <Button type='link' onClick={handleReset}>
+                reset
+              </Button>
+            </Form>
+          </FormWrapper>
           {showRecipe && (
             <div style={{ flex: 1, marginLeft: '32px' }}>
               <FirebaseDatabaseNode path='/recipe'>
