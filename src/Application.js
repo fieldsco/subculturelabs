@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Layout, Select, Menu, Button, Spin, Form } from 'antd';
+import SubcultureTooltip from './components/SubcultureTooltip';
 import { FirebaseDatabaseNode } from '@react-firebase/database';
 import styled from 'styled-components';
 import './App.css';
@@ -38,15 +39,16 @@ const Application = () => {
   const getSelects = () =>
     config.app.recipeProps.map(prop => (
       <FirebaseDatabaseNode key={prop} path={`/${prop}`}>
-        {d => d.value ? (
+        {d =>
+          d.value ? (
             <Form.Item name={prop} rules={[{ required: true }]}>
-              <Select
-                placeholder={`${prop[0].toUpperCase()}${prop.slice(1)}`}
-                onChange={handleChange}>
+              <Select placeholder={`${prop[0].toUpperCase()}${prop.slice(1)}`} onChange={handleChange}>
                 {getMenu(prop, d.value)}
               </Select>
             </Form.Item>
-          ) : <Spin />
+          ) : (
+            <Spin />
+          )
         }
       </FirebaseDatabaseNode>
     ));
@@ -62,6 +64,21 @@ const Application = () => {
     setChosen({});
   };
 
+  const getRecipeButton = () => {
+    const disabled = Object.keys(chosen).length < 4;
+    const button = (
+      <Button type='primary' disabled={disabled} onClick={handleSubmit}>
+        Get Recipe
+      </Button>
+    );
+
+    if (disabled) {
+      return <SubcultureTooltip title='Please make all selections'>{button}</SubcultureTooltip>;
+    }
+
+    return button;
+  };
+
   return (
     <Layout className='layout' style={{ height: '100%' }}>
       <Header>
@@ -72,26 +89,20 @@ const Application = () => {
       </Header>
       <Content style={{ display: 'flex', padding: '0 48px' }}>
         <InnerContent>
-          <Form form={form}>
+          <Form form={form} style={{ minWidth: '250px' }}>
             {getSelects()}
-            <Button
-              type='primary'
-              disabled={Object.keys(chosen).length < 4}
-              onClick={handleSubmit}>
-              Get Recipe
-            </Button>
+            {getRecipeButton()}
             <Button type='link' onClick={handleReset}>
               reset
             </Button>
           </Form>
-          {showRecipe && 
+          {showRecipe && (
             <div style={{ marginLeft: '32px' }}>
-              <h2>Recipe</h2>
               <FirebaseDatabaseNode path='/recipe'>
-                {d => d.value || <Spin />}
+                {d => (d.value ? <div style={{ textAlign: 'justify' }}>{d.value}</div> : <Spin />)}
               </FirebaseDatabaseNode>
             </div>
-          }
+          )}
         </InnerContent>
       </Content>
       <Footer>Subculture Labs ©2021</Footer>
