@@ -18,12 +18,22 @@ const InnerContent = styled.div`
 `;
 
 const FormWrapper = styled.div`
-  min-width: 30px;
+  max-width: 90px;
 
   @media screen and (min-width: 640px) {
     min-width: 150px;
   }
 `;
+
+const ButtonWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  @media screen and (min-width: 640px) {
+    flex-direction: row;
+    min-width: 150px;
+  }
+`
 
 const Application = () => {
   const [chosen, setChosen] = useState({});
@@ -102,10 +112,12 @@ const Application = () => {
           <FormWrapper>
             <Form form={form}>
               {getSelects()}
-              {getRecipeButton()}
-              <Button type='link' onClick={handleReset}>
-                reset
-              </Button>
+              <ButtonWrapper>
+                {getRecipeButton()}
+                <Button type='link' onClick={handleReset}>
+                  reset
+                </Button>
+              </ButtonWrapper>
             </Form>
           </FormWrapper>
           {showRecipe && (
