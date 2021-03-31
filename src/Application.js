@@ -33,7 +33,7 @@ const ButtonWrapper = styled.div`
     flex-direction: row;
     min-width: 150px;
   }
-`
+`;
 
 const Application = () => {
   const [chosen, setChosen] = useState({});
@@ -44,7 +44,9 @@ const Application = () => {
     const arr = e.split('-');
     const obj = Object.assign(chosen, {});
     obj[arr[0]] = arr[1];
-    setChosen({ ...chosen, ...obj });
+
+    // spread to new object to trigger re-render https://stackoverflow.com/a/56266640
+    setChosen({ ...obj });
   };
 
   const getMenu = (prop, list) =>
@@ -55,23 +57,27 @@ const Application = () => {
     ));
 
   const getSelects = () =>
-    config.app.recipeProps.map(prop => (
-      <FirebaseDatabaseNode key={prop} path={`/${prop}`}>
-        {d =>
-          d.value ? (
-            <Form.Item name={prop} rules={[{ required: true }]}>
-              <Select placeholder={`${prop[0].toUpperCase()}${prop.slice(1)}`} onChange={handleChange}>
-                {getMenu(prop, d.value)}
-              </Select>
-            </Form.Item>
-          ) : (
-            <div>
-              <Spin />
-            </div>
-          )
-        }
-      </FirebaseDatabaseNode>
-    ));
+    config.app.recipeProps.map(prop => {
+      if (prop !== 'water' || chosen['type'] === 'flower') {
+        return (
+          <FirebaseDatabaseNode key={prop} path={`/${prop}`}>
+            {d =>
+              d.value ? (
+                <Form.Item name={prop} rules={[{ required: true }]}>
+                  <Select placeholder={`${prop[0].toUpperCase()}${prop.slice(1)}`} onChange={handleChange}>
+                    {getMenu(prop, d.value)}
+                  </Select>
+                </Form.Item>
+              ) : (
+                <div>
+                  <Spin />
+                </div>
+              )
+            }
+          </FirebaseDatabaseNode>
+        );
+      }
+    });
 
   const handleSubmit = () => {
     console.log(chosen);
@@ -92,9 +98,7 @@ const Application = () => {
       </Button>
     );
 
-    if (disabled) {
-      return <SubcultureTooltip title='Please make all selections'>{button}</SubcultureTooltip>;
-    }
+    if (disabled) return <SubcultureTooltip title='Please make all selections'>{button}</SubcultureTooltip>;
 
     return button;
   };
