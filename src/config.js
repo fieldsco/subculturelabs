@@ -8,6 +8,9 @@ export const config = {
   appId: '1:388779378862:web:5de76e132243ba1cdd453f',
   measurementId: 'G-MG38R5P7VG',
   app: {
-    recipeProps: ['type', 'water', 'dosage', 'flavor', 'strain'],
+    recipe: {
+      edibleProps: ['edibleType', 'dosage', 'flavor', 'strain'],
+      flowerProps: ['flowerType', 'water'],
+    },
   },
 };
