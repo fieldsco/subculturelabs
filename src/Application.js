@@ -118,6 +118,7 @@ const Application = () => {
   const getInnerContent = type => (
     <InnerContent>
       <FormWrapper>
+        <h2>{`${type[0].toUpperCase()}${type.slice(1)}`}</h2>
         <Form form={type === 'edible' ? edibleForm : flowerForm}>
           {getSelects(type)}
           <ButtonWrapper>
@@ -129,14 +130,45 @@ const Application = () => {
         </Form>
       </FormWrapper>
       {((type === 'edible' && showEdibleRecipe) || (type === 'flower' && showFlowerRecipe)) && (
-        <div style={{ flex: 1, marginLeft: '32px' }}>
-          <FirebaseDatabaseNode path={`/${type}Recipe`}>
-            {d => (d.value ? <div style={{ textAlign: 'justify' }}>{d.value}</div> : <Spin />)}
-          </FirebaseDatabaseNode>
-        </div>
+        <>
+          <div style={{ flex: 1, marginLeft: '32px' }}>
+            <h2>Ingredients</h2>
+            <FirebaseDatabaseNode
+              path={`/ingredients/${type === 'edible' ? edibleChosen.edibleType : flowerChosen.flowerType}`}>
+              {d =>
+                d.value ? (
+                  <ol>
+                    {d.value.map((ingredient, i) => (
+                      <li key={i}>{ingredient}</li>
+                    ))}
+                  </ol>
+                ) : (
+                  <Spin />
+                )
+              }
+            </FirebaseDatabaseNode>
+          </div>
+          <div style={{ flex: 1, marginLeft: '32px' }}>
+          <h2>Directions</h2>
+            <FirebaseDatabaseNode
+              path={`/directions/${type === 'edible' ? edibleChosen.edibleType : flowerChosen.flowerType}`}>
+              {d =>
+                d.value ? (
+                  <ol>
+                    {d.value.map((recipe, i) => (
+                      <li key={i}>{recipe}</li>
+                    ))}
+                  </ol>
+                ) : (
+                  <Spin />
+                )
+              }
+            </FirebaseDatabaseNode>
+          </div>
+        </>
       )}
-  </InnerContent>
-  )
+    </InnerContent>
+  );
 
   return (
     <Layout className='layout' style={{ height: '100%' }}>
