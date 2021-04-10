@@ -9,6 +9,12 @@ import { config } from './config';
 const { Header, Content, Footer } = Layout;
 const { Option } = Select;
 
+const StyledContent = styled(Content)`
+  display: flex;
+  flex-direction: 'column';
+  padding: '0 48px';
+`;
+
 const InnerContent = styled.div`
   flex: 1;
   display: flex;
@@ -23,6 +29,10 @@ const FormWrapper = styled.div`
   @media screen and (min-width: 640px) {
     min-width: 150px;
   }
+`;
+
+const StyledOl = styled.ol`
+  padding-inline-start: 15px;
 `;
 
 const ButtonWrapper = styled.div`
@@ -137,11 +147,11 @@ const Application = () => {
               path={`/ingredients/${type === 'edible' ? edibleChosen.edibleType : flowerChosen.flowerType}`}>
               {d =>
                 d.value ? (
-                  <ol>
+                  <StyledOl>
                     {d.value.map((ingredient, i) => (
                       <li key={i}>{ingredient}</li>
                     ))}
-                  </ol>
+                  </StyledOl>
                 ) : (
                   <Spin />
                 )
@@ -149,16 +159,16 @@ const Application = () => {
             </FirebaseDatabaseNode>
           </div>
           <div style={{ flex: 1, marginLeft: '32px' }}>
-          <h2>Directions</h2>
+            <h2>Directions</h2>
             <FirebaseDatabaseNode
               path={`/directions/${type === 'edible' ? edibleChosen.edibleType : flowerChosen.flowerType}`}>
               {d =>
                 d.value ? (
-                  <ol>
+                  <StyledOl>
                     {d.value.map((recipe, i) => (
                       <li key={i}>{recipe}</li>
                     ))}
-                  </ol>
+                  </StyledOl>
                 ) : (
                   <Spin />
                 )
@@ -171,17 +181,15 @@ const Application = () => {
   );
 
   return (
-    <Layout className='layout' style={{ height: '100%' }}>
+    <Layout className='layout'>
       <Header>
         <Menu theme='dark' mode='horizontal' selectedKeys={['1']}>
           <Menu.Item key='1'>Recipes</Menu.Item>
           <Menu.Item key='2'>Orders</Menu.Item>
         </Menu>
       </Header>
-      <Content style={{ display: 'flex', flexDirection: 'column', padding: '0 48px' }}>
-        {getInnerContent('edible')}
-        {getInnerContent('flower')}
-      </Content>
+      <StyledContent>{getInnerContent('edible')}</StyledContent>
+      <StyledContent>{getInnerContent('flower')}</StyledContent>
       <Footer>Subculture Labs ©2021</Footer>
     </Layout>
   );
