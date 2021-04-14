@@ -60,8 +60,13 @@ const Application = () => {
     obj[arr[1]] = arr[2];
 
     // spread to new object to trigger re-render https://stackoverflow.com/a/56266640
-    if (type === 'edible') setEdibleChosen({ ...obj });
-    else setFlowerChosen({ ...obj });
+    if (type === 'edible') {
+      setShowEdibleRecipe(false);
+      setEdibleChosen({ ...obj });
+    } else {
+      setShowFlowerRecipe(false);
+      setFlowerChosen({ ...obj });
+    }
   };
 
   const getMenu = (type, prop, list) =>
@@ -125,6 +130,9 @@ const Application = () => {
     return button;
   };
 
+  const interpolateValues = value =>
+    value.replaceAll('Flavoring', `${edibleChosen.flavor[0].toUpperCase()}${edibleChosen.flavor.slice(1)} Flavoring`);
+
   const getInnerContent = type => (
     <InnerContent>
       <FormWrapper>
@@ -149,7 +157,7 @@ const Application = () => {
                 d.value ? (
                   <StyledOl>
                     {d.value.map((ingredient, i) => (
-                      <li key={i}>{ingredient}</li>
+                      <li key={i}>{interpolateValues(ingredient)}</li>
                     ))}
                   </StyledOl>
                 ) : (
