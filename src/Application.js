@@ -16,6 +16,8 @@ const StyledContent = styled(Content)`
 `;
 
 const InnerContent = styled.div`
+  height: 500px;
+  overflow-y: scroll;
   flex: 1;
   display: flex;
   padding: 24px;
