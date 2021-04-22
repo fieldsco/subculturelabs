@@ -132,8 +132,10 @@ const Application = () => {
     return button;
   };
 
-  const interpolateValues = value =>
-    value.replace(/Flavoring/gi, `${edibleChosen.flavor[0].toUpperCase()}${edibleChosen.flavor.slice(1)} Flavoring`);
+  const interpolateValues = (type, value) =>
+    type === 'edible'
+      ? value.replace(/Flavoring/gi, `${edibleChosen.flavor[0].toUpperCase()}${edibleChosen.flavor.slice(1)} Flavoring`)
+      : value;
 
   const getInnerContent = type => (
     <InnerContent>
@@ -159,7 +161,7 @@ const Application = () => {
                 d.value ? (
                   <StyledOl>
                     {d.value.map((ingredient, i) => (
-                      <li key={i}>{interpolateValues(ingredient)}</li>
+                      <li key={i}>{interpolateValues(type, ingredient)}</li>
                     ))}
                   </StyledOl>
                 ) : (
