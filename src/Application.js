@@ -132,6 +132,17 @@ const Application = () => {
     return button;
   };
 
+  const getResetButton = recipeType => {
+    const disabled =
+      recipeType === 'edible' ? Object.keys(edibleChosen).length === 0 : Object.keys(flowerChosen).length === 0;
+
+    return (
+      <Button type='link' onClick={() => handleReset(recipeType)} disabled={disabled}>
+        reset
+      </Button>
+    );
+  };
+
   const interpolateValues = (type, value) =>
     type === 'edible'
       ? value.replace(/Flavoring/gi, `${edibleChosen.flavor[0].toUpperCase()}${edibleChosen.flavor.slice(1)} Flavoring`)
@@ -145,9 +156,7 @@ const Application = () => {
           {getSelects(type)}
           <ButtonWrapper>
             {getRecipeButton(type)}
-            <Button type='link' onClick={() => handleReset(type)}>
-              reset
-            </Button>
+            {getResetButton(type)}
           </ButtonWrapper>
         </Form>
       </FormWrapper>
