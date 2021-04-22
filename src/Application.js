@@ -26,7 +26,7 @@ const InnerContent = styled.div`
 `;
 
 const FormWrapper = styled.div`
-  max-width: 90px;
+  max-width: 120px;
 
   @media screen and (min-width: 640px) {
     min-width: 150px;
@@ -133,7 +133,7 @@ const Application = () => {
   };
 
   const interpolateValues = value =>
-    value.replaceAll('Flavoring', `${edibleChosen.flavor[0].toUpperCase()}${edibleChosen.flavor.slice(1)} Flavoring`);
+    value.replace(/Flavoring/gi, `${edibleChosen.flavor[0].toUpperCase()}${edibleChosen.flavor.slice(1)} Flavoring`);
 
   const getInnerContent = type => (
     <InnerContent>
