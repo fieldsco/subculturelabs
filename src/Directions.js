@@ -19,6 +19,7 @@ const StyledContent = styled(Content)`
 const InnerContent = styled.div`
   display: flex;
   flex: 1;
+  overflow-y: scroll;
   padding: 24px;
   background: #fff;
 `;
@@ -46,7 +47,8 @@ const ButtonWrapper = styled.div`
 `;
 
 const Directions = ({ directionType }) => {
-  const [chosen, setChosen] = useState({ edible: {}, flower: {} });
+  const emptyState = { edible: {}, flower: {} };
+  const [chosen, setChosen] = useState(emptyState);
   const [showRecipe, setShowRecipe] = useState(false);
   const [form] = Form.useForm();
 
@@ -97,7 +99,7 @@ const Directions = ({ directionType }) => {
   const handleReset = () => {
     form.resetFields();
     setShowRecipe(false);
-    setChosen({ flower: {}, edible: {} });
+    setChosen(emptyState);
   };
 
   const getRecipeButton = recipeType => {
