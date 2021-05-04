@@ -9,8 +9,8 @@ export const config = {
   measurementId: 'G-MG38R5P7VG',
   app: {
     recipe: {
-      edibleProps: ['edibleType', 'dosage', 'flavor', 'strain'],
-      flowerProps: ['flowerType', 'water'],
+      edible: ['edibleType', 'dosage', 'flavor', 'strain'],
+      flower: ['flowerType', 'water'],
     },
   },
 };

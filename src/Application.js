@@ -10,7 +10,7 @@ const Application = () => {
   const [activeNav, setActiveNav] = useState('2');
 
   return (
-    <Layout className='layout'>
+    <Layout className='layout' style={{ height: '100%' }}>
       <Header>
         <AppNav onClick={setActiveNav} />
       </Header>

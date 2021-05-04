@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Layout, Select, Button, Spin, Form } from 'antd';
+import merge from 'lodash.merge';
 import SubcultureTooltip from './components/SubcultureTooltip';
 import { FirebaseDatabaseNode } from '@react-firebase/database';
 import styled from 'styled-components';
@@ -16,13 +17,10 @@ const StyledContent = styled(Content)`
 `;
 
 const InnerContent = styled.div`
-  height: 500px;
-  overflow-y: scroll;
-  flex: 1;
   display: flex;
+  flex: 1;
   padding: 24px;
   background: #fff;
-  margin-top: 32px;
 `;
 
 const FormWrapper = styled.div`
@@ -48,27 +46,23 @@ const ButtonWrapper = styled.div`
 `;
 
 const Directions = ({ directionType }) => {
-  const [flowerChosen, setFlowerChosen] = useState({});
-  const [edibleChosen, setEdibleChosen] = useState({});
-  const [showEdibleRecipe, setShowEdibleRecipe] = useState(false);
-  const [showFlowerRecipe, setShowFlowerRecipe] = useState(false);
-  const [edibleForm] = Form.useForm();
-  const [flowerForm] = Form.useForm();
+  const [chosen, setChosen] = useState({ edible: {}, flower: {} });
+  const [showRecipe, setShowRecipe] = useState(false);
+  const [form] = Form.useForm();
 
   const handleChange = e => {
+    // type-prop-key (edible-flavor-cherry)
     const arr = e.split('-');
     const type = arr[0];
-    const obj = Object.assign(type === 'edible' ? edibleChosen : flowerChosen, {});
-    obj[arr[1]] = arr[2];
+    const propKey = {};
+    propKey[arr[1]] = arr[2]; // flavor: 'cherry'
+    const typePropKey = {};
+    typePropKey[type] = propKey; // edible: { flavor: 'cherry' }
+    const merged = merge(chosen, typePropKey); // edible: { flavor: 'cherry', ...}
 
-    // spread to new object to trigger re-render https://stackoverflow.com/a/56266640
-    if (type === 'edible') {
-      setShowEdibleRecipe(false);
-      setEdibleChosen({ ...obj });
-    } else {
-      setShowFlowerRecipe(false);
-      setFlowerChosen({ ...obj });
-    }
+    // spread to new object to trigger rerender
+    setChosen({ ...merged });
+    setShowRecipe(false);
   };
 
   const getMenu = (type, prop, list) =>
@@ -79,8 +73,7 @@ const Directions = ({ directionType }) => {
     ));
 
   const getSelects = type => {
-    const recipe = config.app.recipe;
-    const props = type === 'edible' ? recipe.edibleProps : recipe.flowerProps;
+    const props = config.app.recipe[type];
 
     return props.map(prop => (
       <FirebaseDatabaseNode key={prop} path={`/${prop}`}>
@@ -101,28 +94,16 @@ const Directions = ({ directionType }) => {
     ));
   };
 
-  const handleSubmit = type => {
-    if (type === 'edible') setShowEdibleRecipe(true);
-    else setShowFlowerRecipe(true);
-  };
-
-  const handleReset = type => {
-    if (type === 'edible') {
-      edibleForm.resetFields();
-      setShowEdibleRecipe(false);
-      setEdibleChosen({});
-    } else {
-      flowerForm.resetFields();
-      setShowFlowerRecipe(false);
-      setFlowerChosen({});
-    }
+  const handleReset = () => {
+    form.resetFields();
+    setShowRecipe(false);
+    setChosen({ flower: {}, edible: {} });
   };
 
   const getRecipeButton = recipeType => {
-    const disabled =
-      recipeType === 'edible' ? Object.keys(edibleChosen).length < 4 : Object.keys(flowerChosen).length < 2;
+    const disabled = Object.keys(chosen[recipeType]).length < config.app.recipe[recipeType].length;
     const button = (
-      <Button type='primary' disabled={disabled} onClick={() => handleSubmit(recipeType)}>
+      <Button type='primary' disabled={disabled} onClick={() => setShowRecipe(true)}>
         Get Recipe
       </Button>
     );
@@ -133,26 +114,27 @@ const Directions = ({ directionType }) => {
   };
 
   const getResetButton = recipeType => {
-    const disabled =
-      recipeType === 'edible' ? Object.keys(edibleChosen).length === 0 : Object.keys(flowerChosen).length === 0;
+    const disabled = Object.keys(chosen[recipeType]).length === 0;
 
     return (
-      <Button type='link' onClick={() => handleReset(recipeType)} disabled={disabled}>
+      <Button type='link' onClick={() => handleReset()} disabled={disabled}>
         reset
       </Button>
     );
   };
 
-  const interpolateValues = (type, value) =>
-    type === 'edible'
-      ? value.replace(/Flavoring/gi, `${edibleChosen.flavor[0].toUpperCase()}${edibleChosen.flavor.slice(1)} Flavoring`)
-      : value;
+  const interpolateValues = (type, value) => {
+    const chosenFlavor = chosen[type].flavor;
+    if (!chosenFlavor) return value;
+
+    return value.replace(/Flavoring/gi, `${chosenFlavor[0].toUpperCase()}${chosenFlavor.slice(1)} Flavoring`);
+  };
 
   const getInnerContent = type => (
     <InnerContent>
       <FormWrapper>
         <h2>{`${type[0].toUpperCase()}${type.slice(1)}`}</h2>
-        <Form form={type === 'edible' ? edibleForm : flowerForm}>
+        <Form form={form}>
           {getSelects(type)}
           <ButtonWrapper>
             {getRecipeButton(type)}
@@ -160,12 +142,12 @@ const Directions = ({ directionType }) => {
           </ButtonWrapper>
         </Form>
       </FormWrapper>
-      {((type === 'edible' && showEdibleRecipe) || (type === 'flower' && showFlowerRecipe)) && (
+      {showRecipe && (
         <>
           <div style={{ flex: 1, marginLeft: '32px' }}>
             <h2>Ingredients</h2>
             <FirebaseDatabaseNode
-              path={`/ingredients/${type === 'edible' ? edibleChosen.edibleType : flowerChosen.flowerType}`}>
+              path={`/ingredients/${type === 'edible' ? chosen.edible.edibleType : chosen.flower.flowerType}`}>
               {d =>
                 d.value ? (
                   <StyledOl>
@@ -182,7 +164,7 @@ const Directions = ({ directionType }) => {
           <div style={{ flex: 1, marginLeft: '32px' }}>
             <h2>Directions</h2>
             <FirebaseDatabaseNode
-              path={`/directions/${type === 'edible' ? edibleChosen.edibleType : flowerChosen.flowerType}`}>
+              path={`/directions/${type === 'edible' ? chosen.edible.edibleType : chosen.flower.flowerType}`}>
               {d =>
                 d.value ? (
                   <StyledOl>
