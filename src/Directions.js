@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Layout, Select, Button, Spin, Form } from 'antd';
 import merge from 'lodash.merge';
-import SubcultureTooltip from './components/SubcultureTooltip';
-import { FirebaseDatabaseNode } from '@react-firebase/database';
 import styled from 'styled-components';
+import { FirebaseDatabaseNode } from '@react-firebase/database';
+import SubcultureTooltip from './components/SubcultureTooltip';
 import './App.css';
 import { config } from './config';
 
