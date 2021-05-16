@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import { Button, Layout } from 'antd';
 import styled from 'styled-components';
 import firebase from 'firebase';
-import * as firebaseui from 'firebaseui';
 import AppNav from './AppNav';
 import Directions from './Directions';
 import './App.css';
@@ -26,33 +26,28 @@ const Application = () => {
   const [activeNav, setActiveNav] = useState('2');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Tried putting this in config file but it didn't work
   const uiConfig = {
-    signInSuccessUrl: 'http://localhost:3000',
     signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID, firebase.auth.PhoneAuthProvider.PROVIDER_ID],
-  };
-
-  firebase.auth().onAuthStateChanged(
-    user => {
-      if (user) {
-        setIsAuthenticated(true);
-      } else {
-        setIsAuthenticated(false);
-        // Initialize the FirebaseUI Widget using Firebase
-        // https://github.com/firebase/firebaseui-web/issues/216#issuecomment-459302414
-        const ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(firebase.auth());
-        // The start method will wait until the DOM is loaded
-        ui.start('#firebaseui-auth-container', uiConfig);
-      }
+    signInSuccessUrl: 'http://localhost:3000',
+    callbacks: {
+      // Avoid redirects after sign-in
+      signInSuccessWithAuthResult: () => false,
     },
-    function (error) {
-      console.log(error);
-    }
-  );
+  };
 
   const handleSignOut = () => firebase.auth().signOut();
 
-  return isAuthenticated ? (
+  useEffect(() => {
+    const unregisterAuthObserver = firebase.auth().onAuthStateChanged(user => {
+      setIsAuthenticated(!!user);
+    });
+    return () => unregisterAuthObserver(); // unmount cleanup
+  }, []);
+
+  if (!isAuthenticated) {
+    return <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()} />;
+  }
+  return (
     <Layout className='layout' style={{ height: '100%' }}>
       <StyledHeader>
         <AppNav onClick={setActiveNav} />
@@ -66,8 +61,6 @@ const Application = () => {
       {activeNav === '4' && <Directions directionType='flower' />}
       <Footer>Subculture Labs ©2021</Footer>
     </Layout>
-  ) : (
-    <div id='firebaseui-auth-container' />
   );
 };
 
