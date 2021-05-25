@@ -49,7 +49,7 @@ const ButtonWrapper = styled.div`
 const Directions = ({ directionType }) => {
   const emptyState = { edible: {}, flower: {} };
   const [chosen, setChosen] = useState(emptyState);
-  const [showRecipe, setShowRecipe] = useState(false);
+  const [showIngredient, setShowIngredient] = useState(false);
   const [form] = Form.useForm();
 
   const handleChange = e => {
@@ -64,7 +64,7 @@ const Directions = ({ directionType }) => {
 
     // spread to new object to trigger rerender
     setChosen({ ...merged });
-    setShowRecipe(false);
+    setShowIngredient(false);
   };
 
   const getMenu = (type, prop, list) =>
@@ -75,7 +75,7 @@ const Directions = ({ directionType }) => {
     ));
 
   const getSelects = type => {
-    const props = config.app.recipe[type];
+    const props = config.app.ingredient[type];
 
     return props.map(prop => (
       <FirebaseDatabaseNode key={prop} path={`/${prop}`}>
@@ -98,15 +98,15 @@ const Directions = ({ directionType }) => {
 
   const handleReset = () => {
     form.resetFields();
-    setShowRecipe(false);
+    setShowIngredient(false);
     setChosen(emptyState);
   };
 
-  const getRecipeButton = recipeType => {
-    const disabled = Object.keys(chosen[recipeType]).length < config.app.recipe[recipeType].length;
+  const getingredientButton = ingredientType => {
+    const disabled = Object.keys(chosen[ingredientType]).length < config.app.ingredient[ingredientType].length;
     const button = (
-      <Button type='primary' disabled={disabled} onClick={() => setShowRecipe(true)}>
-        Get Recipe
+      <Button type='primary' disabled={disabled} onClick={() => setShowIngredient(true)}>
+        Get ingredient
       </Button>
     );
 
@@ -115,8 +115,8 @@ const Directions = ({ directionType }) => {
     return button;
   };
 
-  const getResetButton = recipeType => {
-    const disabled = Object.keys(chosen[recipeType]).length === 0;
+  const getResetButton = ingredientType => {
+    const disabled = Object.keys(chosen[ingredientType]).length === 0;
 
     return (
       <Button type='link' onClick={() => handleReset()} disabled={disabled}>
@@ -139,12 +139,12 @@ const Directions = ({ directionType }) => {
         <Form form={form}>
           {getSelects(type)}
           <ButtonWrapper>
-            {getRecipeButton(type)}
+            {getingredientButton(type)}
             {getResetButton(type)}
           </ButtonWrapper>
         </Form>
       </FormWrapper>
-      {showRecipe && (
+      {showIngredient && (
         <>
           <div style={{ flex: 1, marginLeft: '32px' }}>
             <h2>Ingredients</h2>
@@ -170,8 +170,8 @@ const Directions = ({ directionType }) => {
               {d =>
                 d.value ? (
                   <StyledOl>
-                    {d.value.map((recipe, i) => (
-                      <li key={i}>{recipe}</li>
+                    {d.value.map((ingredient, i) => (
+                      <li key={i}>{ingredient}</li>
                     ))}
                   </StyledOl>
                 ) : (

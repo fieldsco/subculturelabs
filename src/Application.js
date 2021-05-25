@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import firebase from 'firebase';
 import AppNav from './AppNav';
 import Directions from './Directions';
+import Notes from './Notes';
 import './App.css';
 
 const { Header, Footer } = Layout;
@@ -44,9 +45,8 @@ const Application = () => {
     return () => unregisterAuthObserver(); // unmount cleanup
   }, []);
 
-  if (!isAuthenticated) {
-    return <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()} />;
-  }
+  if (!isAuthenticated) return <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()} />;
+
   return (
     <Layout className='layout' style={{ height: '100%' }}>
       <StyledHeader>
@@ -57,6 +57,7 @@ const Application = () => {
           </Button>
         </ButtonWrapper>
       </StyledHeader>
+      {activeNav === '1' && <Notes />}
       {activeNav === '2' && <Directions directionType='edible' />}
       {activeNav === '4' && <Directions directionType='flower' />}
       <Footer>Subculture Labs ©2021</Footer>
