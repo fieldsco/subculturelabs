@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Menu } from 'antd';
 
 const AppNav = ({ onClick }) => {
-  const [activeNav, setActiveNav] = useState('2');
+  const [activeNav, setActiveNav] = useState('1');
 
   const handleClick = menuProps => {
     setActiveNav(menuProps.key);

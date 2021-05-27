@@ -24,7 +24,7 @@ const ButtonWrapper = styled.div`
 `;
 
 const Application = () => {
-  const [activeNav, setActiveNav] = useState('2');
+  const [activeNav, setActiveNav] = useState('1');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const uiConfig = {
@@ -50,7 +50,7 @@ const Application = () => {
   return (
     <Layout className='layout' style={{ height: '100%' }}>
       <StyledHeader>
-        <AppNav onClick={setActiveNav} />
+        <AppNav onClick={setActiveNav} activeNav={activeNav} />
         <ButtonWrapper>
           <Button type='text' style={{ color: 'red' }} onClick={handleSignOut}>
             Sign out
