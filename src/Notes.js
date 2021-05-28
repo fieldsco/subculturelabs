@@ -1,8 +1,9 @@
-import { Form, Select, Spin } from 'antd';
+import { Form, Select, Spin, Input, DatePicker } from 'antd';
 import { FirebaseDatabaseNode } from '@react-firebase/database';
 import styled from 'styled-components';
 
 const { Option } = Select;
+const { TextArea } = Input;
 
 const InnerContent = styled.div`
   display: flex;
@@ -13,17 +14,18 @@ const InnerContent = styled.div`
 `;
 
 const FormWrapper = styled.div`
-  max-width: 120px;
+  max-width: 240px;
 
-  @media screen and (min-width: 640px) {
+  /* @media screen and (min-width: 640px) {
     min-width: 150px;
-  }
+  } */
 `;
 
 const Notes = () => {
   const [form] = Form.useForm();
 
   const handleChange = e => {};
+  const handleDateChange = e => {};
 
   return (
     <InnerContent>
@@ -48,6 +50,12 @@ const Notes = () => {
               )
             }
           </FirebaseDatabaseNode>
+          <Input.Group compact>
+            <Input style={{ width: '50%' }} addonAfter='lb' />
+            <Input style={{ width: '50%' }} addonAfter='oz' />
+          </Input.Group>
+          <DatePicker onChange={handleDateChange} />
+          <TextArea rows={4} />
         </Form>
       </FormWrapper>
     </InnerContent>
