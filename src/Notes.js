@@ -1,14 +1,12 @@
-import { Form, Select, Spin, Input, DatePicker, Button, Popconfirm } from 'antd';
+import { Form, Select, Spin, Input, DatePicker, Button, Popconfirm, List, Avatar } from 'antd';
 import { FirebaseDatabaseNode } from '@react-firebase/database';
 import styled from 'styled-components';
+import firebase from 'firebase';
 
 const { Option } = Select;
 const { TextArea } = Input;
 
-const InnerContent = styled.div`
-  display: flex;
-  flex: 1;
-  overflow-y: scroll;
+const Content = styled.div`
   padding: 24px;
   background: #fff;
 `;
@@ -37,17 +35,34 @@ const Notes = () => {
   const handleFinish = values => {
     console.log('finish', values);
   };
-  const handleFinishFailed = e => {
-    console.error('Failed:', e);
-  };
+  const handleFinishFailed = e => console.error('Failed:', e);
   const handleArchive = () => {
     form.submit();
   };
 
+  let notes = [];
+  firebase
+    .database()
+    .ref('notes')
+    .on('value', snap => {
+      snap.forEach(child => {
+        notes.push({
+          date: child.val().date,
+          strain: child.val().strain,
+          lb: child.val().lb,
+          oz: child.val().oz,
+          note: child.val().note,
+        });
+      });
+    });
+
   return (
-    <InnerContent>
+    <Content>
       <FormWrapper>
         <Form form={form} onFinish={handleFinish} onFinishFailed={handleFinishFailed}>
+          <Form.Item name='date' rules={[{ required: true }]}>
+            <DatePicker />
+          </Form.Item>
           <FirebaseDatabaseNode path='/strain'>
             {d =>
               d.value ? (
@@ -77,9 +92,6 @@ const Notes = () => {
               </Form.Item>
             </Input.Group>
           </Form.Item>
-          <Form.Item name='date' rules={[{ required: true }]}>
-            <DatePicker />
-          </Form.Item>
           <Form.Item name='notes' rules={[{ required: true }]}>
             <TextArea rows={4} />
           </Form.Item>
@@ -93,7 +105,27 @@ const Notes = () => {
           </ButtonWrapper>
         </Form>
       </FormWrapper>
-    </InnerContent>
+      <h1 style={{ marginTop: '50px' }}>Notes</h1>
+      <List
+        itemLayout='horizontal'
+        dataSource={notes}
+        renderItem={item => (
+          <List.Item>
+            <List.Item.Meta
+              avatar={
+                <Avatar src='https://cdn.britannica.com/s:300x169,c:crop/63/103163-050-F26733EB/Snoop-Dogg.jpg' />
+              }
+              title={
+                <strong>
+                  {item.date} {item.strain} {item.lb}lb {item.oz}oz
+                </strong>
+              }
+              description={item.note}
+            />
+          </List.Item>
+        )}
+      />
+    </Content>
   );
 };
 
