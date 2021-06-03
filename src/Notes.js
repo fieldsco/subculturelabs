@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Form, Select, Spin, Input, DatePicker, Button, Popconfirm, List, Avatar } from 'antd';
 import { FirebaseDatabaseNode } from '@react-firebase/database';
 import styled from 'styled-components';
@@ -32,29 +33,46 @@ const ButtonWrapper = styled.div`
 
 const Notes = () => {
   const [form] = Form.useForm();
+  const [notes, setNotes] = useState([]);
+
   const handleFinish = values => {
     console.log('finish', values);
+    var notesRef = firebase.database().ref('notes');
+    var newNoteRef = notesRef.push();
+    newNoteRef.set({
+      date: values.date.valueOf(),
+      lb: values.lb,
+      oz: values.oz,
+      strain: values.strain,
+      notes: values.notes,
+      archived: false,
+    });
   };
+
   const handleFinishFailed = e => console.error('Failed:', e);
+
   const handleArchive = () => {
     form.submit();
   };
 
-  let notes = [];
-  firebase
-    .database()
-    .ref('notes')
-    .on('value', snap => {
-      snap.forEach(child => {
-        notes.push({
-          date: child.val().date,
-          strain: child.val().strain,
-          lb: child.val().lb,
-          oz: child.val().oz,
-          note: child.val().note,
+  useEffect(() => {
+    const notes = [];
+    firebase
+      .database()
+      .ref('notes')
+      .on('value', snap => {
+        snap.forEach(child => {
+          notes.push({
+            date: child.val().date,
+            strain: child.val().strain,
+            lb: child.val().lb,
+            oz: child.val().oz,
+            note: child.val().note,
+          });
         });
+        setNotes(notes);
       });
-    });
+  }, []);
 
   return (
     <Content>
