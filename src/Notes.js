@@ -3,6 +3,7 @@ import { Form, Select, Spin, Input, DatePicker, Button, Popconfirm, List, Avatar
 import { FirebaseDatabaseNode } from '@react-firebase/database';
 import styled from 'styled-components';
 import firebase from 'firebase';
+import moment from 'moment';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -39,14 +40,16 @@ const Notes = () => {
     console.log('finish', values);
     var notesRef = firebase.database().ref('notes');
     var newNoteRef = notesRef.push();
-    newNoteRef.set({
+    const newNoteObj = {
       date: values.date.valueOf(),
       lb: values.lb,
       oz: values.oz,
       strain: values.strain,
       notes: values.notes,
       archived: false,
-    });
+    };
+    newNoteRef.set(newNoteObj);
+    getNotes();
   };
 
   const handleFinishFailed = e => console.error('Failed:', e);
@@ -55,7 +58,7 @@ const Notes = () => {
     form.submit();
   };
 
-  useEffect(() => {
+  const getNotes = () => {
     const notes = [];
     firebase
       .database()
@@ -72,6 +75,10 @@ const Notes = () => {
         });
         setNotes(notes);
       });
+  };
+
+  useEffect(() => {
+    getNotes();
   }, []);
 
   return (
@@ -135,7 +142,7 @@ const Notes = () => {
               }
               title={
                 <strong>
-                  {item.date} {item.strain} {item.lb}lb {item.oz}oz
+                  {moment(item.date).format('MM-DD-YYYY')} {item.strain} {item.lb}lb {item.oz}oz
                 </strong>
               }
               description={item.note}
