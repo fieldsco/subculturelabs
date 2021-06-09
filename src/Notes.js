@@ -35,9 +35,9 @@ const ButtonWrapper = styled.div`
 const Notes = () => {
   const [form] = Form.useForm();
   const [notes, setNotes] = useState([]);
+  const [workingNote, setWorkingNote] = useState({});
 
   const handleFinish = values => {
-    console.log('finish', values);
     var notesRef = firebase.database().ref('notes');
     var newNoteRef = notesRef.push();
     const newNoteObj = {
@@ -45,7 +45,7 @@ const Notes = () => {
       lb: values.lb,
       oz: values.oz,
       strain: values.strain,
-      notes: values.notes,
+      note: values.note,
       archived: false,
     };
     newNoteRef.set(newNoteObj);
@@ -63,17 +63,25 @@ const Notes = () => {
     firebase
       .database()
       .ref('notes')
+      .orderByChild('date')
       .on('value', snap => {
         snap.forEach(child => {
-          notes.push({
+          const note = {
             date: child.val().date,
             strain: child.val().strain,
             lb: child.val().lb,
             oz: child.val().oz,
             note: child.val().note,
-          });
+          };
+
+          if (child.val().archived) {
+            notes.push(note);
+          } else {
+            setWorkingNote(note);
+          }
         });
-        setNotes(notes);
+        const reversed = notes.reverse();
+        setNotes(reversed);
       });
   };
 
@@ -84,51 +92,57 @@ const Notes = () => {
   return (
     <Content>
       <FormWrapper>
-        <Form form={form} onFinish={handleFinish} onFinishFailed={handleFinishFailed}>
-          <Form.Item name='date' rules={[{ required: true }]}>
-            <DatePicker />
-          </Form.Item>
-          <FirebaseDatabaseNode path='/strain'>
-            {d =>
-              d.value ? (
-                <Form.Item name='strain' rules={[{ required: true }]}>
-                  <Select placeholder='Strain'>
-                    {Object.keys(d.value).map(key => (
-                      <Option key={key} value={key}>
-                        {`${key[0].toUpperCase()}${key.slice(1)}`}
-                      </Option>
-                    ))}
-                  </Select>
+        {workingNote.note ? (
+          <Form form={form} onFinish={handleFinish} onFinishFailed={handleFinishFailed}>
+            <Form.Item name='date' initialValue={moment(workingNote.date)} rules={[{ required: true }]}>
+              <DatePicker />
+            </Form.Item>
+            <FirebaseDatabaseNode path='/strain'>
+              {d =>
+                d.value ? (
+                  <Form.Item name='strain' initialValue={workingNote.strain} rules={[{ required: true }]}>
+                    <Select placeholder='Strain'>
+                      {Object.keys(d.value).map(key => (
+                        <Option key={key} value={key}>
+                          {`${key[0].toUpperCase()}${key.slice(1)}`}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                ) : (
+                  <div>
+                    <Spin />
+                  </div>
+                )
+              }
+            </FirebaseDatabaseNode>
+            <Form.Item name='yield'>
+              <Input.Group compact>
+                <Form.Item noStyle name='lb' initialValue={workingNote.lb} rules={[{ required: true }]}>
+                  <Input style={{ width: '50%' }} addonAfter='lb' />
                 </Form.Item>
-              ) : (
-                <div>
-                  <Spin />
-                </div>
-              )
-            }
-          </FirebaseDatabaseNode>
-          <Form.Item name='yield'>
-            <Input.Group compact>
-              <Form.Item noStyle name='lb' rules={[{ required: true }]}>
-                <Input style={{ width: '50%' }} addonAfter='lb' />
-              </Form.Item>
-              <Form.Item noStyle name='oz' rules={[{ required: true }]}>
-                <Input style={{ width: '50%' }} addonAfter='oz' />
-              </Form.Item>
-            </Input.Group>
-          </Form.Item>
-          <Form.Item name='notes' rules={[{ required: true }]}>
-            <TextArea rows={4} />
-          </Form.Item>
-          <ButtonWrapper>
-            <Button type='primary' htmlType='submit' style={{ marginBottom: '4px' }}>
-              Save
-            </Button>
-            <Popconfirm onConfirm={handleArchive} title='Are you sure?' okText='Yes' cancelText='No'>
-              <Button type='primary'>Archive</Button>
-            </Popconfirm>
-          </ButtonWrapper>
-        </Form>
+                <Form.Item noStyle name='oz' initialValue={workingNote.oz} rules={[{ required: true }]}>
+                  <Input style={{ width: '50%' }} addonAfter='oz' />
+                </Form.Item>
+              </Input.Group>
+            </Form.Item>
+            <Form.Item name='note' initialValue={workingNote.note} rules={[{ required: true }]}>
+              <TextArea rows={4} />
+            </Form.Item>
+            <ButtonWrapper>
+              <Button type='primary' htmlType='submit' style={{ marginBottom: '4px' }}>
+                Save
+              </Button>
+              <Popconfirm onConfirm={handleArchive} title='Are you sure?' okText='Yes' cancelText='No'>
+                <Button type='primary'>Archive</Button>
+              </Popconfirm>
+            </ButtonWrapper>
+          </Form>
+        ) : (
+          <div>
+            <Spin />
+          </div>
+        )}
       </FormWrapper>
       <h1 style={{ marginTop: '50px' }}>Notes</h1>
       <List
