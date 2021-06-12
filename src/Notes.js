@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Form, Select, Spin, Input, DatePicker, Button, Popconfirm, List, Avatar } from 'antd';
+import { Form, Select, Spin, Input, DatePicker, Button, Popconfirm, List, Avatar, message } from 'antd';
 import { FirebaseDatabaseNode } from '@react-firebase/database';
 import styled from 'styled-components';
 import firebase from 'firebase';
@@ -36,26 +36,40 @@ const Notes = () => {
   const [form] = Form.useForm();
   const [notes, setNotes] = useState([]);
   const [workingNote, setWorkingNote] = useState({});
+  const [isArchiving, setIsArchiving] = useState(false);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   const handleFinish = values => {
-    var notesRef = firebase.database().ref('notes');
-    var newNoteRef = notesRef.push();
-    const newNoteObj = {
+    const noteObj = {
       date: values.date.valueOf(),
       lb: values.lb,
       oz: values.oz,
       strain: values.strain,
       note: values.note,
-      archived: false,
+      archived: isArchiving,
     };
-    newNoteRef.set(newNoteObj);
+    const notesRef = firebase.database().ref('notes');
+
+    if (isArchiving) {
+      var newNoteRef = notesRef.push();
+      newNoteRef.set(noteObj);
+      message.success('Note archived');
+    } else {
+      notesRef.child(workingNote.key).set(noteObj);
+      message.success('Note saved');
+    }
+
     getNotes();
   };
 
-  const handleFinishFailed = e => console.error('Failed:', e);
+  const handleFinishFailed = e => message.error('Failed: ', e);
 
   const handleArchive = () => {
+    setIsArchiving(true);
     form.submit();
+    form.resetFields();
+    setIsArchiving(false);
+    message.success('Note archived');
   };
 
   const getNotes = () => {
@@ -67,6 +81,7 @@ const Notes = () => {
       .on('value', snap => {
         snap.forEach(child => {
           const note = {
+            key: child.key,
             date: child.val().date,
             strain: child.val().strain,
             lb: child.val().lb,
@@ -82,6 +97,7 @@ const Notes = () => {
         });
         const reversed = notes.reverse();
         setNotes(reversed);
+        setIsDataLoaded(true);
       });
   };
 
@@ -90,9 +106,9 @@ const Notes = () => {
   }, []);
 
   return (
-    <Content>
-      <FormWrapper>
-        {workingNote.note ? (
+    isDataLoaded && (
+      <Content>
+        <FormWrapper>
           <Form form={form} onFinish={handleFinish} onFinishFailed={handleFinishFailed}>
             <Form.Item name='date' initialValue={moment(workingNote.date)} rules={[{ required: true }]}>
               <DatePicker />
@@ -138,33 +154,29 @@ const Notes = () => {
               </Popconfirm>
             </ButtonWrapper>
           </Form>
-        ) : (
-          <div>
-            <Spin />
-          </div>
-        )}
-      </FormWrapper>
-      <h1 style={{ marginTop: '50px' }}>Notes</h1>
-      <List
-        itemLayout='horizontal'
-        dataSource={notes}
-        renderItem={item => (
-          <List.Item>
-            <List.Item.Meta
-              avatar={
-                <Avatar src='https://cdn.britannica.com/s:300x169,c:crop/63/103163-050-F26733EB/Snoop-Dogg.jpg' />
-              }
-              title={
-                <strong>
-                  {moment(item.date).format('MM-DD-YYYY')} {item.strain} {item.lb}lb {item.oz}oz
-                </strong>
-              }
-              description={item.note}
-            />
-          </List.Item>
-        )}
-      />
-    </Content>
+        </FormWrapper>
+        <h1 style={{ marginTop: '50px' }}>Notes</h1>
+        <List
+          itemLayout='horizontal'
+          dataSource={notes}
+          renderItem={item => (
+            <List.Item>
+              <List.Item.Meta
+                avatar={
+                  <Avatar src='https://cdn.britannica.com/s:300x169,c:crop/63/103163-050-F26733EB/Snoop-Dogg.jpg' />
+                }
+                title={
+                  <strong>
+                    {moment(item.date).format('MM-DD-YYYY')} {item.strain} {item.lb}lb {item.oz}oz
+                  </strong>
+                }
+                description={item.note}
+              />
+            </List.Item>
+          )}
+        />
+      </Content>
+    )
   );
 };
 
