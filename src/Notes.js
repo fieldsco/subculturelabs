@@ -65,6 +65,7 @@ const Notes = () => {
         strain: '',
         note: '',
       });
+      setWorkingNote({});
       setIsArchiving(false);
     }
 
@@ -139,7 +140,7 @@ const Notes = () => {
               )
             }
           </FirebaseDatabaseNode>
-          <Form.Item name='yield'>
+          <Form.Item>
             <Input.Group compact>
               <Form.Item noStyle name='lb' initialValue={workingNote.lb} rules={[{ required: true }]}>
                 <Input style={{ width: '50%' }} addonAfter='lb' />
