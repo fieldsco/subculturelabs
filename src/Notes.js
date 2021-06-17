@@ -32,9 +32,19 @@ const ButtonWrapper = styled.div`
   }
 `;
 
+const SearchWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 20px 0;
+  max-width: 450px;
+`;
+
 const Notes = () => {
   const [form] = Form.useForm();
+  const [searchForm] = Form.useForm();
   const [notes, setNotes] = useState([]);
+  const [filteredNotes, setFilteredNotes] = useState([]);
   const [workingNote, setWorkingNote] = useState({});
   const [isArchiving, setIsArchiving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -73,11 +83,21 @@ const Notes = () => {
     getNotes();
   };
 
-  const handleFinishFailed = e => message.error('Failed: ', e);
+  const handleFinishFailed = e => console.error('Failed: ', e);
 
   const handleArchive = () => {
     setIsArchiving(true);
     form.submit();
+  };
+
+  const handleFinishSearch = values => {
+    let filteredNotes = [];
+    notes.map(note => {
+      if (values.searchDate && values.searchDate.isSame(moment(note.date), 'day')) filteredNotes.push(note);
+      else if (values.searchText === note.lb) filteredNotes.push(note);
+    });
+
+    setFilteredNotes(filteredNotes);
   };
 
   const getNotes = () => {
@@ -116,6 +136,7 @@ const Notes = () => {
 
   return !isLoading ? (
     <Content>
+      <h1>Working Note</h1>
       <FormWrapper>
         <Form form={form} onFinish={handleFinish} onFinishFailed={handleFinishFailed}>
           <Form.Item name='date' initialValue={moment(workingNote.date)} rules={[{ required: true }]}>
@@ -163,10 +184,25 @@ const Notes = () => {
           </ButtonWrapper>
         </Form>
       </FormWrapper>
-      <h1 style={{ marginTop: '50px' }}>Notes</h1>
+      <h1 style={{ margin: '50px 0 0 0' }}>Archived Notes</h1>
+      <SearchWrapper>
+        <Form form={searchForm} onFinish={handleFinishSearch}>
+          <Form.Item name='searchDate'>
+            <DatePicker placeholder='Search by date' style={{ width: '150px' }} />
+          </Form.Item>
+          <Form.Item name='searchText'>
+            <Input placeholder='Search by strain/yield/note' style={{ width: '200px' }} />
+          </Form.Item>
+          <Button type='link' htmlType='submit'>
+            search
+          </Button>
+        </Form>
+      </SearchWrapper>
       <List
         itemLayout='horizontal'
-        dataSource={notes}
+        dataSource={
+          searchForm.getFieldValue('searchDate') || searchForm.getFieldValue('searchText') ? filteredNotes : notes
+        }
         renderItem={item => (
           <List.Item>
             <List.Item.Meta
