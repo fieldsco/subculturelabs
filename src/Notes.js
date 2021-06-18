@@ -91,10 +91,19 @@ const Notes = () => {
   };
 
   const handleFinishSearch = values => {
-    let filteredNotes = [];
+    const filteredNotes = [];
+    let matchedDate = false,
+      matchedText = false;
     notes.map(note => {
-      if (values.searchDate && values.searchDate.isSame(moment(note.date), 'day')) filteredNotes.push(note);
-      else if (values.searchText === note.lb) filteredNotes.push(note);
+      matchedDate = values.searchDate && values.searchDate.isSame(moment(note.date), 'day');
+      matchedText = values.searchText && (values.searchText === note.strain || note.note.includes(values.searchText));
+
+      // if date matched entered value, and search text is either blank or it matches
+      if (matchedDate && (!values.searchText || matchedText)) filteredNotes.push(note);
+      // if text matched entered value, and there is no date entered
+      else if (matchedText && !values.searchDate) filteredNotes.push(note);
+      // if nothing entered, that's considered "all"
+      else if (!values.searchDate && !values.searchText) filteredNotes.push(note);
     });
 
     setFilteredNotes(filteredNotes);
@@ -191,7 +200,7 @@ const Notes = () => {
             <DatePicker placeholder='Search by date' style={{ width: '150px' }} />
           </Form.Item>
           <Form.Item name='searchText'>
-            <Input placeholder='Search by strain/yield/note' style={{ width: '200px' }} />
+            <Input placeholder='Search by strain/note' style={{ width: '200px' }} />
           </Form.Item>
           <Button type='link' htmlType='submit'>
             search
