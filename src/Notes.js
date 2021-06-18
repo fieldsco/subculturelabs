@@ -200,7 +200,7 @@ const Notes = () => {
             <DatePicker placeholder='Search by date' style={{ width: '150px' }} />
           </Form.Item>
           <Form.Item name='searchText'>
-            <Input placeholder='Search by strain/note' style={{ width: '200px' }} />
+            <Input placeholder='Search by strain/note' style={{ width: '200px' }} allowClear />
           </Form.Item>
           <Button type='link' htmlType='submit'>
             search
