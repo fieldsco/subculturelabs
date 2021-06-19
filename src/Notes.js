@@ -109,6 +109,14 @@ const Notes = () => {
     setFilteredNotes(filteredNotes);
   };
 
+  const handleReset = () => {
+    searchForm.setFieldsValue({
+      searchDate: '',
+      searchText: '',
+    });
+    setFilteredNotes(notes);
+  };
+
   const getNotes = () => {
     setIsLoading(true);
     const notes = [];
@@ -202,9 +210,14 @@ const Notes = () => {
           <Form.Item name='searchText'>
             <Input placeholder='Search by strain/note' style={{ width: '200px' }} allowClear />
           </Form.Item>
-          <Button type='link' htmlType='submit'>
-            search
-          </Button>
+          <ButtonWrapper>
+            <Button type='link' htmlType='submit'>
+              search
+            </Button>
+            <Button type='link' onClick={handleReset}>
+              reset
+            </Button>
+          </ButtonWrapper>
         </Form>
       </SearchWrapper>
       <List

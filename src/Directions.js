@@ -119,7 +119,7 @@ const Directions = ({ directionType }) => {
     const disabled = Object.keys(chosen[ingredientType]).length === 0;
 
     return (
-      <Button type='link' onClick={() => handleReset()} disabled={disabled}>
+      <Button type='link' onClick={handleReset} disabled={disabled}>
         reset
       </Button>
     );
