@@ -180,10 +180,10 @@ const Notes = () => {
           </FirebaseDatabaseNode>
           <Form.Item>
             <Input.Group compact>
-              <Form.Item noStyle name='lb' initialValue={workingNote.lb} rules={[{ required: true }]}>
+              <Form.Item noStyle name='lb' initialValue={workingNote.lb}>
                 <Input style={{ width: '50%' }} addonAfter='lb' />
               </Form.Item>
-              <Form.Item noStyle name='oz' initialValue={workingNote.oz} rules={[{ required: true }]}>
+              <Form.Item noStyle name='oz' initialValue={workingNote.oz}>
                 <Input style={{ width: '50%' }} addonAfter='oz' />
               </Form.Item>
             </Input.Group>
